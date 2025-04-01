@@ -120,6 +120,7 @@ class ReportGenerator:
         all_data: Dict[str, pd.DataFrame],
         all_insights: Dict[str, Dict],
         all_visualizations: Dict[str, Dict[str, str]],
+        all_predictions: Dict[str, Dict[str, float]],
     ) -> Tuple[str, str]:
         """Generate HTML and PDF reports with market analysis.
 
@@ -127,6 +128,7 @@ class ReportGenerator:
             all_data: Dictionary mapping index names to their DataFrames.
             all_insights: Dictionary mapping index names to their insights.
             all_visualizations: Dictionary mapping index names to their visualizations.
+            all_predictions: Dictionary mapping index names to their ML predictions.
 
         Returns:
             Tuple containing paths to the generated HTML and PDF reports.
@@ -139,6 +141,7 @@ class ReportGenerator:
         html_content = template.render(
             all_insights=all_insights,
             all_visualizations=all_visualizations,
+            all_predictions=all_predictions,
             signal=combined_signal["signal"],
             signal_class=combined_signal["signal_class"],
             overlay_plot=self.create_overlay_visualization(all_data)

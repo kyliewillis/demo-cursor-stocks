@@ -151,6 +151,28 @@
             <div class="metric">
                 <strong>Total Return:</strong> {{ insights.total_return|round(2) }}%
             </div>
+            
+            <!-- ML Prediction Section -->
+            <div class="metric">
+                <strong>ML Prediction:</strong>
+                <div class="signal {% if all_predictions[index_name].buy_probability > 60 %}bullish{% elif all_predictions[index_name].buy_probability < 40 %}bearish{% else %}neutral{% endif %}">
+                    <div>Buy Signal Probability: {{ all_predictions[index_name].buy_probability|round(1) }}%</div>
+                    <div>Model Confidence (AUC): {{ all_predictions[index_name].model_confidence|round(1) }}%</div>
+                    <div>Recommendation: 
+                        {% if all_predictions[index_name].buy_probability > 60 %}
+                            Strong Buy Signal
+                        {% elif all_predictions[index_name].buy_probability > 50 %}
+                            Weak Buy Signal
+                        {% elif all_predictions[index_name].buy_probability < 40 %}
+                            Strong Sell Signal
+                        {% elif all_predictions[index_name].buy_probability < 50 %}
+                            Weak Sell Signal
+                        {% else %}
+                            Hold
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="chart">
             <h3>Price and Moving Averages</h3>

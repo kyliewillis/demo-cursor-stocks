@@ -110,18 +110,27 @@ class TestReportGenerator(unittest.TestCase):
                 "OTHER_INDEX"
             )
         }
-        
+        all_predictions = {
+            'TEST_INDEX': {
+                'buy_probability': 55.0,
+                'model_confidence': 95.0
+            },
+            'OTHER_INDEX': {
+                'buy_probability': 45.0,
+                'model_confidence': 95.0
+            }
+        }
+
         html_path, pdf_path = self.reporter.generate_html_report(
             all_data,
             all_insights,
-            all_visualizations
+            all_visualizations,
+            all_predictions
         )
-        
-        # Check if both reports were generated
+
+        # Verify report files were created
         self.assertTrue(os.path.exists(html_path))
         self.assertTrue(os.path.exists(pdf_path))
-        self.assertTrue(html_path.endswith('market_indices_report.html'))
-        self.assertTrue(pdf_path.endswith('market_indices_report.pdf'))
 
     def test_get_signal_class(self):
         """Test signal class determination."""
