@@ -6,4 +6,7 @@ seaborn>=0.11.0
 yfinance>=0.1.63
 jinja2>=3.0.0
 python-dotenv>=1.0.0
-pandas-datareader>=0.10.0 
+pandas-datareader>=0.10.0
+
+# Report Generation
+reportlab>=4.1.0 

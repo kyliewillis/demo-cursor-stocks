@@ -10,6 +10,11 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.figure import Figure
 from jinja2 import Environment, FileSystemLoader
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.units import inch
 
 
 class ReportGenerator:
@@ -115,8 +120,17 @@ class ReportGenerator:
         all_data: Dict[str, pd.DataFrame],
         all_insights: Dict[str, Dict],
         all_visualizations: Dict[str, Dict[str, str]],
-    ) -> str:
-        """Generate an HTML report with market analysis."""
+    ) -> Tuple[str, str]:
+        """Generate HTML and PDF reports with market analysis.
+
+        Args:
+            all_data: Dictionary mapping index names to their DataFrames.
+            all_insights: Dictionary mapping index names to their insights.
+            all_visualizations: Dictionary mapping index names to their visualizations.
+
+        Returns:
+            Tuple containing paths to the generated HTML and PDF reports.
+        """
         # Get combined market signal
         combined_signal = self._get_combined_signal(all_insights)
         
@@ -130,12 +144,77 @@ class ReportGenerator:
             overlay_plot=self.create_overlay_visualization(all_data)
         )
         
-        # Save report
-        output_path = os.path.join(self.output_dir, "market_indices_report.html")
-        with open(output_path, 'w') as f:
+        # Save HTML report
+        html_path = os.path.join(self.output_dir, "market_indices_report.html")
+        with open(html_path, 'w') as f:
             f.write(html_content)
             
-        return output_path
+        # Generate PDF from HTML
+        pdf_path = os.path.join(self.output_dir, "market_indices_report.pdf")
+        self._generate_pdf(html_content, pdf_path)
+            
+        return html_path, pdf_path
+
+    def _generate_pdf(self, html_content: str, output_path: str) -> None:
+        """Generate PDF from HTML content.
+
+        Args:
+            html_content: HTML string to convert to PDF.
+            output_path: Path where to save the PDF file.
+        """
+        # Create PDF document
+        doc = SimpleDocTemplate(
+            output_path,
+            pagesize=A4,
+            rightMargin=72,
+            leftMargin=72,
+            topMargin=72,
+            bottomMargin=72
+        )
+        
+        # Get styles
+        styles = getSampleStyleSheet()
+        title_style = styles['Heading1']
+        heading_style = styles['Heading2']
+        normal_style = styles['Normal']
+        
+        # Create content
+        story = []
+        
+        # Add title
+        story.append(Paragraph("Market Indices Analysis Report", title_style))
+        story.append(Spacer(1, 12))
+        
+        # Add market summary
+        story.append(Paragraph("Overall Market Summary", heading_style))
+        story.append(Spacer(1, 12))
+        
+        # Add signal information
+        signal_style = ParagraphStyle(
+            'SignalStyle',
+            parent=normal_style,
+            fontSize=12,
+            spaceAfter=30
+        )
+        
+        # Extract signal from HTML content
+        import re
+        signal_match = re.search(r'<div class="market-signal signal .*?">\s*(.*?)\s*</div>', html_content, re.DOTALL)
+        signal_text = signal_match.group(1).strip() if signal_match else "No Signal Available"
+        story.append(Paragraph(f"Market Analysis: {signal_text}", signal_style))
+        
+        # Extract and add overlay plot from HTML content
+        overlay_match = re.search(r'<img src="data:image/png;base64,(.*?)" alt="Overlay Plot"', html_content, re.DOTALL)
+        if overlay_match:
+            img_data = base64.b64decode(overlay_match.group(1))
+            img = Image(BytesIO(img_data))
+            img.drawHeight = 4*inch
+            img.drawWidth = 7*inch
+            story.append(img)
+        story.append(Spacer(1, 12))
+        
+        # Build PDF
+        doc.build(story)
 
     def _generate_index_section(
         self,
@@ -226,9 +305,26 @@ class ReportGenerator:
         Returns:
             Dictionary containing combined signal information.
         """
+        if not all_insights:
+            return {
+                "signal": "No Data Available",
+                "signal_class": "neutral",
+                "strength": "N/A",
+                "value": 0
+            }
+            
         signals = []
         for insights in all_insights.values():
-            signals.append(insights['predictions']['combined_signal'])
+            if 'predictions' in insights and 'combined_signal' in insights['predictions']:
+                signals.append(insights['predictions']['combined_signal'])
+            
+        if not signals:
+            return {
+                "signal": "No Signals Available",
+                "signal_class": "neutral",
+                "strength": "N/A",
+                "value": 0
+            }
             
         avg_signal = sum(signals) / len(signals)
         

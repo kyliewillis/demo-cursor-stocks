@@ -89,7 +89,7 @@ class TestReportGenerator(unittest.TestCase):
         self.assertTrue(len(overlay) > 0)
 
     def test_generate_html_report(self):
-        """Test HTML report generation."""
+        """Test HTML and PDF report generation."""
         all_data = {
             'TEST_INDEX': self.test_df,
             'OTHER_INDEX': self.test_df.copy()
@@ -111,15 +111,17 @@ class TestReportGenerator(unittest.TestCase):
             )
         }
         
-        output_path = self.reporter.generate_html_report(
+        html_path, pdf_path = self.reporter.generate_html_report(
             all_data,
             all_insights,
             all_visualizations
         )
         
-        # Check if report was generated
-        self.assertTrue(os.path.exists(output_path))
-        self.assertTrue(output_path.endswith('market_indices_report.html'))
+        # Check if both reports were generated
+        self.assertTrue(os.path.exists(html_path))
+        self.assertTrue(os.path.exists(pdf_path))
+        self.assertTrue(html_path.endswith('market_indices_report.html'))
+        self.assertTrue(pdf_path.endswith('market_indices_report.pdf'))
 
     def test_get_signal_class(self):
         """Test signal class determination."""

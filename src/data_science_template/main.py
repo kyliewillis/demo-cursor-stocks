@@ -4,21 +4,24 @@ import os
 from typing import Dict, Optional
 
 import pandas as pd
-from data_fetcher import DataFetcher
-from analyzer import MarketIndexAnalyzer
-from reporter import ReportGenerator
+from .data_fetcher import DataFetcher
+from .analyzer import MarketIndexAnalyzer
+from .reporter import ReportGenerator
 
 
-def load_data(index_name: str) -> Optional[pd.DataFrame]:
+def load_data(index_name: str, base_dir: Optional[str] = None) -> Optional[pd.DataFrame]:
     """Load market data from CSV file.
 
     Args:
         index_name: Name of the market index.
+        base_dir: Optional base directory path. If not provided, uses default data directory.
 
     Returns:
         DataFrame containing market data or None if file not found.
     """
-    file_path = f"data/raw/{index_name.lower()}_data.csv"
+    if base_dir is None:
+        base_dir = "data/raw"
+    file_path = os.path.join(base_dir, f"{index_name.lower()}_data.csv")
     try:
         df = pd.read_csv(file_path)
         df["date"] = pd.to_datetime(df["date"])
@@ -89,8 +92,10 @@ def main() -> None:
 
     # Generate report
     print("\nGenerating HTML report...")
-    report_generator.generate_html_report(all_data, all_insights, all_visualizations)
-    print(f"Report generated successfully: {report_generator.output_dir}/market_indices_report.html")
+    html_path, pdf_path = report_generator.generate_html_report(all_data, all_insights, all_visualizations)
+    print(f"Reports generated successfully:")
+    print(f"- HTML Report: {html_path}")
+    print(f"- PDF Report: {pdf_path}")
 
 
 if __name__ == "__main__":

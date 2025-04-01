@@ -96,6 +96,10 @@ class TestMain(unittest.TestCase):
             'rsi': 'test',
             'volatility': 'test'
         }
+        mock_reporter.generate_html_report.return_value = (
+            str(self.test_dir / "market_indices_report.html"),
+            str(self.test_dir / "market_indices_report.pdf")
+        )
         mock_report_generator.return_value = mock_reporter
         
         # Create test data files
@@ -121,8 +125,9 @@ class TestMain(unittest.TestCase):
         # Run main function
         main()
         
-        # Verify no report was generated
+        # Verify no reports were generated
         self.assertFalse((self.test_dir / "market_indices_report.html").exists())
+        self.assertFalse((self.test_dir / "market_indices_report.pdf").exists())
 
 if __name__ == '__main__':
     unittest.main() 
