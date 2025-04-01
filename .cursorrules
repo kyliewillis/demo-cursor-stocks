@@ -1,0 +1,52 @@
+{
+    "python": {
+        "formatting": {
+            "tool": "black",
+            "line_length": 88,
+            "target_version": ["py38"]
+        },
+        "linting": {
+            "tool": "flake8",
+            "max_line_length": 88,
+            "ignore": ["E203", "W503"]
+        },
+        "type_checking": {
+            "tool": "mypy",
+            "strict": true,
+            "ignore_missing_imports": true
+        },
+        "testing": {
+            "tool": "pytest",
+            "test_pattern": "test_*.py"
+        },
+        "documentation": {
+            "style": "google",
+            "require_docstrings": true,
+            "require_type_hints": true
+        }
+    },
+    "jupyter": {
+        "formatting": {
+            "tool": "nbformat",
+            "clear_output": true
+        },
+        "documentation": {
+            "require_markdown": true,
+            "require_docstrings": true
+        }
+    },
+    "git": {
+        "commit_message": {
+            "style": "conventional",
+            "require_description": true
+        },
+        "branch_naming": {
+            "pattern": "^(feature|bugfix|hotfix|release)/[a-z0-9-]+$"
+        }
+    },
+    "documentation": {
+        "require_update": true,
+        "paths": ["docs/"],
+        "formats": ["md", "rst"]
+    }
+} 

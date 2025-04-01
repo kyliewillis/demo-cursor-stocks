@@ -1,0 +1,48 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="data-science-template",
+    version="0.1.0",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    install_requires=[
+        "numpy>=1.24.0",
+        "pandas>=2.0.0",
+        "scikit-learn>=1.3.0",
+        "matplotlib>=3.7.0",
+        "seaborn>=0.12.0",
+        "jupyter>=1.0.0",
+        "notebook>=7.0.0",
+        "ipykernel>=6.0.0",
+    ],
+    extras_require={
+        "dev": [
+            "black>=23.0.0",
+            "flake8>=6.0.0",
+            "pylint>=3.0.0",
+            "nbformat>=6.0.0",
+            "pytest>=7.0.0",
+            "sphinx>=7.0.0",
+            "sphinx-rtd-theme>=1.3.0",
+            "mypy>=1.5.0",
+            "types-setuptools>=68.0.0",
+        ],
+    },
+    python_requires=">=3.8",
+    author="Your Name",
+    author_email="your.email@example.com",
+    description="A template for data science projects with best practices",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/yourusername/data-science-template",
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+    ],
+) 
