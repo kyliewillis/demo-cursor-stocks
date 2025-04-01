@@ -61,7 +61,7 @@ class DataFetcher:
             df = df[[col for col in standard_cols if col in df.columns]]
 
             if 'date' in df.columns:
-                df['date'] = pd.to_datetime(df['date']).dt.tz_localize(None).dt.date # Ensure date only, no timezone
+                df['date'] = pd.to_datetime(df['date']).dt.tz_localize(None)  # Remove timezone but keep datetime
 
             print(f"  Successfully fetched {len(df)} records for {ticker}.")
             return df
