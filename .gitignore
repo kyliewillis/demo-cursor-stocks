@@ -50,6 +50,7 @@ ENV/
 *.pth
 *.model
 *.joblib
+data/
 
 # Logs
 *.log

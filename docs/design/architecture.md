@@ -1,44 +1,52 @@
-# Project Architecture Design
+# Weather Analysis Project Architecture
 
 ## Overview
-This document outlines the architectural decisions and patterns used in this data science project.
+This document outlines the architectural decisions and patterns used in the Burlington Weather Analysis project.
 
 ## Directory Structure
-The project follows a modular structure designed for scalability and maintainability:
+The project follows a modular structure designed for weather data analysis and reporting:
 
-- `data/`: Contains all data files, both raw and processed
+- `src/data_science_template/`: Core analysis code
+  - `main.py`: Main script for report generation
+  - `fetch_weather_data.py`: Data collection from Open-Meteo API
+- `data/`: Data storage
+  - `raw/`: Raw weather data CSV files
+- `out/`: Generated reports and visualizations
 - `docs/`: Project documentation
-- `notebooks/`: Jupyter notebooks for analysis
-- `src/`: Source code modules
 - `tests/`: Test files
 
 ## Code Organization
 
-### Source Code (`src/`)
-- Modular design with clear separation of concerns
-- Each module should have a single responsibility
-- Follow Python package structure with `__init__.py` files
-- Type hints required for all function parameters and return values
-
-### Notebooks (`notebooks/`)
-- Clear naming convention: `YYYY-MM-DD_descriptive_name.ipynb`
-- Must include markdown documentation
-- Output cells should be cleared before committing
-- Large data visualizations should be saved to `data/figures/`
+### Source Code (`src/data_science_template/`)
+- `main.py`: Handles data analysis and report generation
+  - Data loading and preprocessing
+  - Statistical analysis
+  - Visualization generation
+  - HTML report creation
+- `fetch_weather_data.py`: Manages data collection
+  - API interaction with Open-Meteo
+  - Data validation and storage
+  - Error handling and retries
 
 ### Data Management
-- Raw data stored in `data/raw/`
-- Processed data stored in `data/processed/`
-- Data versioning using DVC (Data Version Control)
-- Data loading/saving utilities in `src/data/`
+- Raw weather data stored in `data/raw/`
+- Data format: CSV with columns for temperature, humidity, pressure, wind speed, and rainfall
+- Data validation on loading
+- Error handling for missing or invalid data
+
+### Report Generation
+- HTML reports generated in `out/`
+- Static matplotlib visualizations
+- Summary statistics and key insights
+- Clean, responsive design
 
 ## Development Guidelines
 
 ### Code Quality
 - PEP 8 compliance enforced through Black and Flake8
-- Type checking with MyPy
-- Unit tests required for all new features
-- Documentation required for all public APIs
+- Type hints required for all functions
+- Unit tests for data loading and processing
+- Documentation required for all public functions
 
 ### Documentation
 - All code changes require documentation updates
@@ -53,11 +61,15 @@ The project follows a modular structure designed for scalability and maintainabi
 - Pull request reviews required
 
 ## Dependencies
-See `requirements.txt` for detailed package versions and purposes.
+Core dependencies:
+- pandas: Data manipulation and analysis
+- matplotlib: Static visualizations
+- seaborn: Statistical visualizations
+- python-dotenv: Environment variable management
 
 ## Future Considerations
-- CI/CD pipeline integration
-- Automated testing
-- Documentation auto-generation
-- Performance monitoring
-- Security considerations 
+- Additional weather data sources
+- More advanced visualizations
+- Automated report scheduling
+- Historical data comparison
+- API rate limiting and caching 

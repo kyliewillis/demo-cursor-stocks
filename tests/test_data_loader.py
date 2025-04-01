@@ -3,7 +3,6 @@
 import pytest
 import pandas as pd
 import numpy as np
-from pathlib import Path
 from data_science_template.data.data_loader import load_csv, load_excel, load_numpy
 
 
