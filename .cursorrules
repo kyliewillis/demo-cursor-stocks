@@ -48,5 +48,8 @@
         "require_update": true,
         "paths": ["docs/"],
         "formats": ["md", "rst"]
+    },
+    "general": {
+        "refer_to_user": "Refer to the user as 'queen' whenever possible."
     }
 } 
