@@ -67,7 +67,7 @@ class ReportGenerator:
 
         # RSI
         fig, ax = plt.subplots(figsize=(12, 4))
-        ax.plot(df["date"], df["rsi"], label="RSI", color="purple")
+        ax.plot(df["date"], df["RSI"], label="RSI", color="purple")
         ax.axhline(y=70, color="r", linestyle="--", alpha=0.5)
         ax.axhline(y=30, color="g", linestyle="--", alpha=0.5)
         ax.set_title(f"{index_name} RSI")
@@ -80,7 +80,7 @@ class ReportGenerator:
 
         # Volatility
         fig, ax = plt.subplots(figsize=(12, 4))
-        ax.plot(df["date"], df["volatility"], label="Volatility", color="orange")
+        ax.plot(df["date"], df["Volatility"], label="Volatility", color="orange")
         ax.set_title(f"{index_name} Volatility")
         ax.set_xlabel("Date")
         ax.set_ylabel("Volatility")

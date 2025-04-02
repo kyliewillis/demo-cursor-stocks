@@ -4,10 +4,10 @@ import os
 from typing import Dict, Optional, Tuple
 
 import pandas as pd
-from src.data_science_template.data_fetcher import DataFetcher
-from src.data_science_template.analyzer import MarketIndexAnalyzer
-from src.data_science_template.reporter import ReportGenerator
-from src.data_science_template.predictor import MarketPredictor
+from data_science_template.data_fetcher import DataFetcher
+from data_science_template.analyzer import MarketIndexAnalyzer
+from data_science_template.reporter import ReportGenerator
+from data_science_template.predictor import MarketPredictor
 
 
 def load_data(index_name: str, base_dir: Optional[str] = None) -> Optional[pd.DataFrame]:
@@ -47,19 +47,26 @@ def process_index(df: pd.DataFrame, index_name: str) -> Tuple[Dict, pd.DataFrame
         analyzer = MarketIndexAnalyzer(df, index_name)
         predictor = MarketPredictor()
         
-        # Train predictor
+        # Train predictor and get DataFrame with features
         predictor.train(df)
+        X, _ = predictor.prepare_features(df)
         
         # Get predictions
         predictions = predictor.predict(df)
         print(f"\nPredictions for {index_name}:")
         print(f"Buy Probability: {predictions['buy_probability']:.2f}%")
-        print(f"Model Confidence: {predictions['model_confidence']:.2f}%")
+        print(f"Model Confidence: {predictions['confidence']:.2f}%")
         
         # Get insights
         insights = analyzer.calculate_all_insights()
         
-        return insights, analyzer.df, predictions
+        # Combine the original DataFrame with the features DataFrame
+        df_with_features = df.copy()
+        for col in X.columns:
+            if col not in df_with_features.columns:
+                df_with_features[col] = X[col]
+        
+        return insights, df_with_features, predictions
     except Exception as e:
         print(f"Error processing {index_name}: {str(e)}")
         return {}, df, None
