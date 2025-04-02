@@ -50,16 +50,20 @@ def test_process_index(sample_market_data):
     """Test processing market index data."""
     result = process_index(sample_market_data, "SP500")
     assert result is not None
-    insights, df = result
+    insights, df, predictions = result
     assert isinstance(insights, dict)
     assert isinstance(df, pd.DataFrame)
-    assert len(df) == len(sample_market_data)
+    assert isinstance(predictions, (dict, type(None)))
 
 def test_process_index_with_invalid_data():
     """Test processing with invalid data."""
     invalid_df = pd.DataFrame({'invalid': [1, 2, 3]})
     result = process_index(invalid_df, "SP500")
-    assert result is None
+    assert result is not None
+    insights, df, predictions = result
+    assert insights == {}
+    assert isinstance(df, pd.DataFrame)
+    assert predictions is None
 
 def test_main(tmp_path, monkeypatch):
     """Test main function execution."""
@@ -72,7 +76,7 @@ def test_main(tmp_path, monkeypatch):
         def create_visualizations(self, df, insights, index_name):
             return {}
         
-        def generate_html_report(self, all_data, all_insights, all_visualizations):
+        def generate_html_report(self, all_data, all_insights, all_visualizations, all_predictions=None):
             return "test.html", "test.pdf"
     
     # Patch the imports

@@ -12,32 +12,30 @@ from data_science_template.predictor import (
 @pytest.fixture
 def sample_market_data():
     """Create sample market data for testing."""
-    np.random.seed(42)
-    dates = pd.date_range(start='2023-01-01', periods=300, freq='D')
+    # Generate dates
+    dates = pd.date_range(start='2020-01-01', end='2023-12-31', freq='D')
+    n = len(dates)
     
-    # Generate random prices with both upward and downward trends
-    base_price = 100
-    trend = np.concatenate([
-        np.linspace(0, 0.5, 100),    # Upward trend
-        np.linspace(0.5, -0.5, 100), # Downward trend
-        np.linspace(-0.5, 0, 100)    # Recovery trend
-    ])
-    noise = np.random.normal(0, 0.02, 300)
-    prices = base_price * (1 + trend + noise)
+    # Generate prices with both upward and downward trends
+    np.random.seed(42)
+    t = np.linspace(0, 8*np.pi, n)  # Multiple cycles
+    trend = 100 + 30 * np.sin(t) + t/10  # Sine wave with slight upward trend
+    noise = np.random.normal(0, 5, n)
+    prices = trend + noise
     
     # Create OHLCV data
     df = pd.DataFrame({
         'date': dates,
-        'open': prices * (1 + np.random.normal(0, 0.01, 300)),
-        'high': prices * (1 + np.random.uniform(0, 0.02, 300)),
-        'low': prices * (1 - np.random.uniform(0, 0.02, 300)),
+        'open': prices * (1 + np.random.normal(0, 0.01, n)),
+        'high': prices * (1 + np.random.uniform(0, 0.02, n)),
+        'low': prices * (1 - np.random.uniform(0, 0.02, n)),
         'close': prices,
-        'volume': np.random.lognormal(10, 1, 300)
+        'volume': np.random.lognormal(10, 1, n)
     })
     
     # Ensure OHLC relationships
-    df['high'] = df[['open', 'close']].max(axis=1) + np.random.uniform(0, 0.01, 300)
-    df['low'] = df[['open', 'close']].min(axis=1) - np.random.uniform(0, 0.01, 300)
+    df['high'] = df[['open', 'close']].max(axis=1) + np.random.uniform(0, 0.01, n)
+    df['low'] = df[['open', 'close']].min(axis=1) - np.random.uniform(0, 0.01, n)
     
     return df
 

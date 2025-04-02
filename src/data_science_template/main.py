@@ -4,10 +4,10 @@ import os
 from typing import Dict, Optional, Tuple
 
 import pandas as pd
-from .data_fetcher import DataFetcher
-from .analyzer import MarketIndexAnalyzer
-from .reporter import ReportGenerator
-from .predictor import MarketPredictor
+from src.data_science_template.data_fetcher import DataFetcher
+from src.data_science_template.analyzer import MarketIndexAnalyzer
+from src.data_science_template.reporter import ReportGenerator
+from src.data_science_template.predictor import MarketPredictor
 
 
 def load_data(index_name: str, base_dir: Optional[str] = None) -> Optional[pd.DataFrame]:
