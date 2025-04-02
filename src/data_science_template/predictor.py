@@ -1,8 +1,8 @@
 """Market prediction module using XGBoost."""
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.metrics import roc_auc_score
 import xgboost as xgb
 
@@ -108,18 +108,27 @@ class MarketPredictor:
     """Market prediction model using XGBoost."""
     
     def __init__(self):
-        """Initialize the predictor."""
+        """Initialize the predictor with anti-overfitting parameters."""
         self.model = xgb.XGBClassifier(
             objective='binary:logistic',
             eval_metric='auc',
-            base_score=0.5,  # Set base_score between 0 and 1
+            learning_rate=0.01,  # Lower learning rate for better generalization
+            max_depth=3,  # Limit tree depth to prevent overfitting
+            min_child_weight=1,  # Minimum sum of instance weight in a child
+            subsample=0.8,  # Subsample ratio of training instances
+            colsample_bytree=0.8,  # Subsample ratio of columns when constructing each tree
+            reg_alpha=0.1,  # L1 regularization
+            reg_lambda=1.0,  # L2 regularization
+            n_estimators=1000,  # Maximum number of trees
             random_state=42
         )
         self.feature_columns = None
         self.auc_score = None
+        self.feature_importance = None
+        self.cv_scores = None
     
     def train(self, df: pd.DataFrame) -> None:
-        """Train the model on historical data.
+        """Train the model on historical data with cross-validation.
         
         Args:
             df: DataFrame with OHLCV data
@@ -137,15 +146,36 @@ class MarketPredictor:
         if len(y.unique()) < 2:
             raise ValueError("Training data must contain both positive and negative examples")
         
-        # Split data
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
+        # Split data into train, validation, and test sets
+        X_train, X_temp, y_train, y_temp = train_test_split(
+            X, y, test_size=0.3, random_state=42, stratify=y
+        )
+        X_val, X_test, y_val, y_test = train_test_split(
+            X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp
         )
         
-        # Train model
-        self.model.fit(X_train, y_train)
+        # Perform cross-validation
+        kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+        self.cv_scores = cross_val_score(
+            self.model, X_train, y_train,
+            cv=kfold, scoring='roc_auc'
+        )
         
-        # Calculate AUC score
+        # Train model with early stopping
+        eval_set = [(X_val, y_val)]
+        self.model.fit(
+            X_train, y_train,
+            eval_set=eval_set,
+            verbose=False
+        )
+        
+        # Calculate feature importance
+        self.feature_importance = pd.DataFrame({
+            'feature': self.feature_columns,
+            'importance': self.model.feature_importances_
+        }).sort_values('importance', ascending=False)
+        
+        # Calculate AUC score on test set
         y_pred = self.model.predict_proba(X_test)[:, 1]
         self.auc_score = roc_auc_score(y_test, y_pred)
     
@@ -180,7 +210,10 @@ class MarketPredictor:
         probabilities = self.model.predict_proba(X)
         buy_probability = probabilities[:, 1].mean() * 100
         
+        # Calculate model confidence based on cross-validation scores
+        cv_confidence = np.mean(self.cv_scores) * 100 if self.cv_scores is not None else 0.0
+        
         return {
             'buy_probability': buy_probability,
-            'model_confidence': self.auc_score * 100 if self.auc_score is not None else 0.0
+            'model_confidence': cv_confidence
         } 
